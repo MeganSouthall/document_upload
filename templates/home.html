@@ -1,0 +1,94 @@
+{% extends '_base.html' %}
+
+{% set activePage = 'home' %}
+
+{%- block content -%}
+    <div class="row">
+        <div class="col-2">
+            <div class="content mx-1" style="height: 90vh;">
+                <h5 style="padding-bottom: 2vh">Quick Insights</h5>
+                <div class="card">
+                    <h6>Project</h6>
+                    <p><strong>{{ files['current_name'] }}</strong></p>
+                </div>
+                <div class="card">
+                    <h6><i class="fa-regular fa-circle-user fa-lg" style="color: rgba(232, 77, 74, 1);"></i> Customer
+                    </h6>
+                    <p>{{ files['current_customer'] }}</p>
+                </div>
+                <div class="card">
+                    <h6><i class="fa-regular fa-floppy-disk fa-lg" style="color: rgba(232, 77, 74, 1);"></i> Storage
+                    </h6>
+                    <p>{{ files['file_weight'] }}</p>
+                </div>
+                <div class="card">
+                    <h6><i class="fa-solid fa-list-ul fa-lg" style="color: rgba(232, 77, 74, 1);"></i> File Count</h6>
+                    <p>{{ files['file_count'] }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-10" id="file_container">
+            <div class="content mx-1" style="height: 90vh;">
+                <h5 style="padding-bottom: 2vh">Loaded Documents</h5>
+                <div class="row" style="padding-right: 10px; padding-left: 10px">
+                    {% for f in files['files'] %}
+                        <div class="col-3">
+                            <div class="card" style="height: 80%;" ondblclick='updateDoc("{{ f[0] + "." + f[1] }}")'>
+                                {% if f[1] == "PDF" %}
+                                    <p><i class="fa-solid fa-file-pdf fa-2x" style="color: rgba(232, 77, 74, 1);"></i>
+                                    </p>
+                                {% else %}
+                                    <p><i class="fa-solid fa-link fa-2x" style="color: rgba(232, 77, 74, 1);"></i></p>
+                                {% endif %}
+                                <h6>{{ f[0] }}</h6>
+                                <p>{{ f[1] }} &middot; {{ f[2] }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="col-2">
+                        <div class="card" style="height: 80%; text-align: center; background-color: #ececec">
+                            <p><i class="fa-solid fa-plus fa-2x" style="color: white"></i></p>
+                            <h6>Add File</h6>
+                            <p><small>(or drag&drop)</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-none" id="file_viewer">
+            <div class="content mx-1" style="height: 90vh; position: relative;">
+                <i class="fa-solid fa-xmark"
+                   style="color: rgba(232, 77, 74, 1); position: absolute; top: 15px; right: 15px;"
+                   onclick="closeDoc()"></i>
+                <h5 style="padding-bottom: 2vh" id="filename_label"></h5>
+                <embed type="application/pdf" width="100%" height="95%" id="document_container">
+            </div>
+        </div>
+    </div>
+{%- endblock -%}
+
+{%- block script -%}
+    <script>
+        function updateDoc(filename) {
+            $("#file_container").attr('class', "col-6");
+            $("#file_viewer").attr('class', "col-4");
+            $("#filename_label").html(filename);
+            if (filename.toLowerCase().endsWith("url")) {
+                $("#document_container").attr('type', "text/html");
+                $.get("file/" + filename, function (data, status) {
+                    $("#document_container").attr('src', data);
+                });
+
+            } else {
+                $("#document_container").attr('type', "application/pdf");
+                $("#document_container").attr('src', "file/" + filename + "#navpanes=0&scrollbar=0");
+            }
+        }
+
+        function closeDoc() {
+            $("#file_container").attr('class', "col-10");
+            $("#file_viewer").attr('class', "d-none");
+        }
+    </script>
+{%- endblock -%}
