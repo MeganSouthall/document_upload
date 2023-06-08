@@ -4,9 +4,11 @@ import os
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'  # Define the folder to store uploaded documents
 
+
 @app.route('/')
 def upload_form():
     return render_template('upload.html')
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
