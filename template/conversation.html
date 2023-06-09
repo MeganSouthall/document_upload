@@ -1,0 +1,42 @@
+{% for d in conversation %}
+    <div class="w-100" style="position: relative">
+        {% if d["side"]=="user" %}
+            <div class="chat_element user">
+                {% autoescape false %}
+                    {{ d["sentence"] }}
+                {% endautoescape %}
+            </div>
+        {% elif d["side"]=="bot" %}
+            <div class="chat_element bot">
+                {% autoescape false %}
+                    {{ d["sentence"] }}
+                {% endautoescape %}
+                <hr class="solid">
+                {% autoescape false %}
+                    {% for px in d["meta"]["source"] %}
+                        {% if "page" in px and "doc" in px %}
+                            <a href="javascript:gotoSource('{{ px["doc"] }}', '{{ px["page"] }}')" class="source_link">{{ px["doc"] }} (Page {{ px["page"]|int + 1 }})</a>
+                        {% else %}
+                        {{ px }}
+                        {% endif %}
+                        <br>
+                    {% endfor %}
+                {% endautoescape %}
+            </div>
+        {% else %}
+            <div style="width: 90%;padding: 12px;" class="row">
+                <div style="width: 30%">
+                    <div class="chat_element bot float-start">
+                        <div id="wave-container" class="wave-container">
+                            <div class="dot" id="d1"></div>
+                            <div class="dot" id="d2"></div>
+                            <div class="dot" id="d3"></div>
+                            <div class="dot" id="d4"></div>
+                            <div class="dot" id="d5"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}

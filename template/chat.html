@@ -1,0 +1,264 @@
+{% extends '_base.html' %}
+
+{% set activePage = 'chat' %}
+
+{% block style %}
+    <style>
+        #current_conversation {
+            padding-right: 20px;
+            padding-left: 20px;
+            margin-top: 2vh;
+            height: 80vh;
+        }
+
+        #question_box {
+            width: 100%;
+            margin-top: 2vh;
+            box-sizing: border-box;
+            background-color: rgba(0, 0, 0, 0) !important;
+            border-radius: 12px;
+            border-color: rgba(232, 77, 74, 0.8);
+            padding: 6px;
+            color: #0c2440;
+        }
+
+        .source_link {
+            color: rgba(232, 77, 74, 0.8);
+        }
+
+        .chat_element {
+            color: #0c2440;
+            font-size: 0.8em;
+            padding: 12px;
+            margin-bottom: 12px;
+            margin-top: 12px;
+        }
+
+        .chat_element.user {
+            color: white;
+            background-color: rgba(232, 77, 74, 0.8);
+            border-radius: 12px 12px 0 12px;
+            margin-inline-start: 64px;
+        }
+
+        .chat_element.bot {
+            background-color: #ececec;
+            border-radius: 12px 12px 12px 0;
+            margin-inline-end: 64px;
+        }
+
+        ::placeholder {
+            color: #bdc3c7;
+        }
+
+        #wave-container {
+            position: relative;
+            height: 18px;
+            width: 54px;
+        }
+
+        .dot {
+            transform-origin: 50% 50%;
+            height: 6px;
+            width: 6px;
+            border-radius: 50%;
+            top: 0;
+            background-color: rgba(232, 77, 74, 0.8);
+            position: absolute;
+            -webkit-animation: vertical-movement 1s infinite ease-in-out;
+            -moz-animation: vertical-movement 1s infinite ease-in-out;
+            -ms-animation: vertical-movement 1s infinite ease-in-out;
+            -o-animation: vertical-movement 1s infinite ease-in-out;
+            animation: vertical-movement 1s infinite ease-in-out;
+        }
+
+        #d1 {
+            left: 9px;
+            -webkit-animation-delay: -0.2s;
+            -moz-animation-delay: -0.2s;
+            -ms-animation-delay: -0.2s;
+            -o-animation-delay: -0.2s;
+            animation-delay: -0.2s;
+        }
+
+        #d2 {
+            left: 18px;
+            -webkit-animation-delay: -0.4s;
+            -moz-animation-delay: -0.4s;
+            -ms-animation-delay: -0.4s;
+            -o-animation-delay: -0.4s;
+            animation-delay: -0.4s;
+        }
+
+        #d3 {
+            left: 27px;
+            -webkit-animation-delay: -0.6s;
+            -moz-animation-delay: -0.6s;
+            -ms-animation-delay: -0.6s;
+            -o-animation-delay: -0.6s;
+            animation-delay: -0.6s;
+        }
+
+        #d4 {
+            left: 36px;
+            -webkit-animation-delay: -0.8s;
+            -moz-animation-delay: -0.8s;
+            -ms-animation-delay: -0.8s;
+            -o-animation-delay: -0.8s;
+            animation-delay: -0.8s;
+        }
+
+        #d5 {
+            left: 45px;
+            -webkit-animation-delay: -1s;
+            -moz-animation-delay: -1s;
+            -ms-animation-delay: -1s;
+            -o-animation-delay: -1s;
+            animation-delay: -1s;
+        }
+
+        @-webkit-keyframes vertical-movement {
+            0%, 100% {
+                -webkit-transform: translateY(0%);
+            }
+            50% {
+                -webkit-transform: translateY(12px);
+            }
+        }
+
+        @keyframes vertical-movemen {
+            0%, 100% {
+                -webkit-transform: translateY(0%);
+                -moz-transform: translateY(0%);
+                -ms-transform: translateY(0%);
+                -o-transform: translateY(0%);
+                transform: translateY(0%);
+            }
+            50% {
+                -webkit-transform: translateY(12px);
+                -moz-transform: translateY(12px);
+                -ms-transform: translateY(12px);
+                -o-transform: translateY(12px);
+                transform: translateY(12px);
+            }
+        }
+    </style>
+{%- endblock -%}
+
+{%- block content -%}
+    <div class="row">
+        <div class="col-2">
+            <div class="content mx-1" style="height: 90vh;">
+                <h5 style="padding-bottom: 2vh">Documents</h5>
+                <div class="row" style="padding-right: 10px; padding-left: 10px">
+                    {% for f in files['files'] %}
+                        <div>
+                            <div class="card" style="height: 80%;" ondblclick='updateDoc("{{ f[0] + "." + f[1] }}")'>
+                                <h6>{{ f[0] }}</h6>
+                                <p>{{ f[1] }} &middot; {{ f[2] }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-10" id="file_container">
+            <div class="content mx-1" style="height: 90vh;">
+                <h5 style="padding-bottom: 2vh">Conversation</h5>
+                <div class="d-flex align-items-end flex-column" style="padding-right: 10px; padding-left: 10px"
+                     id="current_conversation">
+                    <div class="mb-auto p-2 overflow-auto" id="conversation">
+
+                    </div>
+                    <div class="w-100 p-2">
+                        <label for="question_box"></label><textarea id="question_box" rows="3"
+                                                                    placeholder="{{ prompt }}"
+                                                                    required></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-none" id="file_viewer">
+            <div class="content mx-1" style="height: 90vh; position: relative;">
+                <i class="fa-solid fa-xmark"
+                   style="color: rgba(232, 77, 74, 1); position: absolute; top: 15px; right: 15px;"
+                   onclick="closeDoc()"></i>
+                <h5 style="padding-bottom: 2vh" id="filename_label"></h5>
+                <embed type="application/pdf" width="100%" height="95%" id="document_container">
+            </div>
+        </div>
+    </div>
+{%- endblock -%}
+
+{%- block script -%}
+    <script>
+        function updateDoc(filename) {
+            $("#file_container").attr('class', "col-6");
+            $("#file_viewer").attr('class', "col-4");
+            $("#filename_label").html(filename);
+            if (filename.toLowerCase().endsWith("url")) {
+                $("#document_container").attr('type', "text/html");
+                $.get("file/" + filename, function (data, status) {
+                    $("#document_container").attr('src', data);
+                });
+
+            } else {
+                $("#document_container").attr('type', "application/pdf");
+                $("#document_container").attr('src', "file/" + filename + "#navpanes=0&scrollbar=0");
+            }
+        }
+
+        function gotoSource(filename, page) {
+            $("#file_container").attr('class', "col-5");
+            $("#file_viewer").attr('class', "col-5");
+            $("#filename_label").html(filename);
+            $("#document_container").attr('type', "application/pdf");
+            $("#document_container").attr('src', "file/" + filename + "#navpanes=0&scrollbar=0&page=" + page);
+        }
+
+        function closeDoc() {
+            $("#file_container").attr('class', "col-10");
+            $("#file_viewer").attr('class', "d-none");
+        }
+
+        function loadConversation() {
+            $.ajax({
+                url: "/conversation",
+                type: "get",
+                success: function (response) {
+                    $("#conversation").html(response);
+                    $("#conversation").scrollTop($("#conversation")[0].scrollHeight);
+                }
+            });
+        }
+
+        loadConversation();
+        $('#question_box').keyup(function (e) {
+            var code = e.keyCode ? e.keyCode : e.which;
+            if (code === 13) {
+                var text = $(this).val();
+                $('#question_box').val("");
+                $.ajax({
+                    url: "/load_chat",
+                    type: "post",
+                    data: {prompt: text},
+                    success: function (response) {
+                        $("#conversation").html(response);
+                        $("#conversation").scrollTop($("#conversation")[0].scrollHeight);
+                    }
+                });
+                $.ajax({
+                    url: "/conversate",
+                    type: "post",
+                    data: {prompt: text},
+                    success: function (response) {
+                        $("#conversation").html(response);
+                        $("#conversation").scrollTop($("#conversation")[0].scrollHeight);
+                    }
+                });
+                return false;
+            }
+        });
+    </script>
+{%- endblock -%}
