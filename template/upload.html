@@ -1,10 +1,62 @@
 <!DOCTYPE html>
 <html>
-  <body>
-    <h1>Upload a Document</h1>
-    <form method="POST" action="/upload" enctype="multipart/form-data">
-      <input type="file" name="file">
-      <input type="submit" value="Add File">
-    </form>
-  </body>
+<head>
+    <title>Card Upload Example</title>
+        <style>
+      .card {
+        width: 100px;
+        height: 200px;
+        border-radius: 12px;
+        border-color: #ececec;
+        border-width: thin;
+        background-color: white;
+        padding: 10px;
+        margin-bottom: 2vh;
+        cursor: pointer;
+      }
+    </style>
+</head>
+<body>
+                    <div class="col-2">
+                        <div class="card" style="height: 80%; text-align: center; background-color: #ececec"  onclick="uploadFile()">
+            <p><i class="fa-solid fa-plus fa-2x" style="color: white"></i></p>
+      <div class = "card-content">
+          <h6>Add File</h6>
+          <input type="file" id="fileInput" style="display: none;" >
+          <p><small>(or drag&drop)</small></p>
+             </div>
+    </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        function uploadFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function() {
+            var file = this.files[0];
+            var formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/home', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                alert('File uploaded successfully.');
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Error uploading file.');
+            });
+        });
+    </script>
+</body>
 </html>

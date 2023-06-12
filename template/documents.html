@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Uploaded Documents</title>
+</head>
+<body>
+    <h1> Uploaded documents </h1>
+    {% for document in documents %}
+    <div class="card">
+        <h2>{{ document }}</h2>
+    </div>
+    {% endfor %}
+</body>
+</html>
